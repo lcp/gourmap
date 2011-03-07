@@ -6,6 +6,7 @@
 #include <webkit/webkit.h>
 #include <glib/gi18n.h>
 
+#include "google-map-template.h"
 #include "gourmap-ui.h"
 
 struct GourmapUiPrivate
@@ -21,6 +22,12 @@ G_DEFINE_TYPE (GourmapUi, gourmap_ui, G_TYPE_OBJECT)
 #define GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
                         GOURMAP_TYPE_UI, GourmapUiPrivate))
 
+static char*
+construct_map_htm (double latitude,double longitude)
+{
+	return g_strdup_printf (google_map_template, latitude, longitude);
+}
+
 static void
 destroy_cb (GtkWidget *widget, gpointer data)
 {
@@ -30,6 +37,18 @@ destroy_cb (GtkWidget *widget, gpointer data)
 static void
 activate_addr_entry_cb (GtkWidget *entry, gpointer data)
 {
+	GourmapUi *ui = GOURMAP_UI (data);
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+	char *map_htm;
+
+	/* TODO Get the right latitude and longitude */
+	map_htm = construct_map_htm (25.079636,121.546678);
+	webkit_web_view_load_string (WEBKIT_WEB_VIEW (priv->web_view),
+				     map_htm,
+				     "text/html",
+				     "UTF-8",
+				     "");
+	g_free (map_htm);
 }
 
 static void
@@ -40,6 +59,7 @@ gourmap_ui_init (GourmapUi *ui)
 	GtkWidget *toolbar;
 	GtkWidget *addr_label;
 	GtkToolItem *item;
+	char *map_htm;
 
 	priv = GET_PRIVATE (ui);
 	vbox = gtk_vbox_new (FALSE, 0);
@@ -51,7 +71,13 @@ gourmap_ui_init (GourmapUi *ui)
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
 	gtk_container_add (GTK_CONTAINER (priv->map), GTK_WIDGET (priv->web_view));
-	// TODO load the default map
+	map_htm = construct_map_htm (25.026218,121.543545);
+	webkit_web_view_load_string (WEBKIT_WEB_VIEW (priv->web_view),
+				     map_htm,
+				     "text/html",
+				     "UTF-8",
+				     "");
+	g_free (map_htm);
 
 	gtk_box_pack_start (GTK_BOX (vbox), priv->map, TRUE, TRUE, 0);
 
@@ -73,10 +99,10 @@ gourmap_ui_init (GourmapUi *ui)
 	gtk_toolbar_insert (GTK_TOOLBAR (toolbar), item, -1);
 
 	item = gtk_tool_button_new_from_stock (GTK_STOCK_OK);
-	g_signal_connect_swapped (G_OBJECT (item),
-				  "clicked",
-				  G_CALLBACK (activate_addr_entry_cb),
-				  (gpointer) ui);
+	g_signal_connect (G_OBJECT (item),
+			  "clicked",
+			  G_CALLBACK (activate_addr_entry_cb),
+			  (gpointer) ui);
 	gtk_toolbar_insert (GTK_TOOLBAR (toolbar), item, -1);
 
 	gtk_box_pack_start (GTK_BOX (vbox), toolbar, FALSE, FALSE, 0);
