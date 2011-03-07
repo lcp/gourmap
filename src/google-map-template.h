@@ -13,11 +13,17 @@ function initialize() {\
   var myOptions = {\
     zoom: 14,\
     center: myLatlng,\
-    mapTypeId: google.maps.MapTypeId.ROADMAP\
+    mapTypeControl: false,\
+    mapTypeId: google.maps.MapTypeId.ROADMAP,\
+    streetViewControl: false,\
   };\
   var map = new google.maps.Map(\
       document.getElementById(\"map_canvas\"),\
       myOptions);\
+  var marker = new google.maps.Marker({\
+      position: myLatlng,\
+      map: map,\
+  });\
 }\
 </script>\
 </head>\
