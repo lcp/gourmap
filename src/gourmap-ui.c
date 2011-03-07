@@ -4,6 +4,8 @@
 
 #include <gtk/gtk.h>
 #include <webkit/webkit.h>
+#include <glib/gi18n.h>
+
 #include "gourmap-ui.h"
 
 struct GourmapUiPrivate
@@ -20,9 +22,14 @@ G_DEFINE_TYPE (GourmapUi, gourmap_ui, G_TYPE_OBJECT)
                         GOURMAP_TYPE_UI, GourmapUiPrivate))
 
 static void
-destroy_cb (GtkWidget* widget, gpointer data)
+destroy_cb (GtkWidget *widget, gpointer data)
 {
     gtk_main_quit ();
+}
+
+static void
+activate_addr_entry_cb (GtkWidget *entry, gpointer data)
+{
 }
 
 static void
@@ -59,7 +66,7 @@ gourmap_ui_init (GourmapUi *ui)
 	gtk_tool_item_set_expand (item, TRUE);
 	priv->addr_entry = gtk_entry_new ();
 	gtk_container_add (GTK_CONTAINER (item), priv->addr_entry);
-	g_signal_connect (G_OBJECT (addr_entry),
+	g_signal_connect (G_OBJECT (priv->addr_entry),
 			  "activate",
 			  G_CALLBACK (activate_addr_entry_cb),
 			  (gpointer) ui);

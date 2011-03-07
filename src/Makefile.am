@@ -18,10 +18,16 @@ INCLUDES = \
 
 libexec_PROGRAMS = gourmap
 
-urfkilld_SOURCES =						\
+gourmap_SOURCES =						\
 	gourmap-ui.h						\
 	gourmap-ui.c						\
 	gourmap-main.c
+
+gourmap_LDADD =							\
+	$(GTK2_LIBS)						\
+	$(GOBJECT_LIBS)						\
+	$(WEBKIT_LIBS)						\
+	$(GLIB_LIBS)
 
 clean-local :
 	rm -f *~
