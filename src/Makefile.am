@@ -11,6 +11,8 @@ INCLUDES = \
 	-DPACKAGE_LIB_DIR=\""$(libdir)"\"			\
 	-D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT			\
 	-I$(top_srcdir)						\
+	$(REST_CFLAGS)						\
+	$(JSON_GLIB_CFLAGS)					\
 	$(GTK2_CFLAGS)						\
 	$(GOBJECT_CFLAGS)					\
 	$(WEBKIT_CFLAGS)					\
@@ -19,11 +21,15 @@ INCLUDES = \
 libexec_PROGRAMS = gourmap
 
 gourmap_SOURCES =						\
+	gourmap-util.h						\
+	gourmap-util.c						\
 	gourmap-ui.h						\
 	gourmap-ui.c						\
 	gourmap-main.c
 
 gourmap_LDADD =							\
+	$(REST_LIBS)						\
+	$(JSON_GLIB_LIBS)					\
 	$(GTK2_LIBS)						\
 	$(GOBJECT_LIBS)						\
 	$(WEBKIT_LIBS)						\

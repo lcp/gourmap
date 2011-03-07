@@ -1,3 +1,4 @@
+/* (double)latitude, (double)longitude, (unsigned int) zoom*/
 const char *google_map_template = "\
 <!DOCTYPE html>\
 <html>\
@@ -11,7 +12,7 @@ const char *google_map_template = "\
 function initialize() {\
   var myLatlng = new google.maps.LatLng(%.6f, %.6f);\
   var myOptions = {\
-    zoom: 14,\
+    zoom: %u,\
     center: myLatlng,\
     mapTypeControl: false,\
     mapTypeId: google.maps.MapTypeId.ROADMAP,\
