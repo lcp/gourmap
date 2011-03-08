@@ -15,26 +15,23 @@ const char *google_map_template = "\
 <link href=\"http://code.google.com/apis/maps/documentation/javascript/examples/default.css\" rel=\"stylesheet\" type=\"text/css\" />\
 <script type=\"text/javascript\" src=\"http://maps.google.com/maps/api/js?sensor=false\"></script>\
 <script type=\"text/javascript\">\
+var geocoder;\
+var map;\
 var circle;\
+var query = '%s';\
 function initialize() {\
-  var myLatlng = new google.maps.LatLng(%.6f, %.6f);\
+  geocoder = new google.maps.Geocoder();\
   var myOptions = {\
     zoom: %u,\
-    center: myLatlng,\
     mapTypeControl: false,\
     mapTypeId: google.maps.MapTypeId.ROADMAP,\
     streetViewControl: false,\
     scaleControl: true,\
   };\
-  var map = new google.maps.Map(\
+  map = new google.maps.Map(\
       document.getElementById(\"map_canvas\"),\
       myOptions);\
-  var marker = new google.maps.Marker({\
-      position: myLatlng,\
-      map: map,\
-  });\
   circle = new google.maps.Circle({\
-    center: myLatlng,\
     radius: %u,\
     map: map,\
     fillOpacity: 0.1,\
@@ -42,8 +39,25 @@ function initialize() {\
     strokeWeight: 1,\
     clickable: false,\
   });\
+  codeAddress ();\
 %s\
 }\
+function codeAddress() {\
+  var address = query;\
+  geocoder.geocode( { 'address': address}, function(results, status) {\
+    if (status == google.maps.GeocoderStatus.OK) {\
+      position = results[0].geometry.location;\
+      map.setCenter(position);\
+      circle.setCenter(position);\
+      var marker = new google.maps.Marker({\
+          map: map,\
+          position: position\
+      });\
+    } else {\
+      alert(\"Geocode was not successful for the following reason: \" + status);\
+    }\
+  });\
+};\
 </script>\
 </head>\
 <body onload=\"initialize()\">\
