@@ -138,7 +138,6 @@ gourmap_ui_init (GourmapUi *ui)
 	GourmapUiPrivate *priv;
 
 	priv = GET_PRIVATE (ui);
-//	priv->proxy = rest_proxy_new ("http://maps.google.com/maps/api/", FALSE);
 
 	priv->current_addr = NULL;
 	priv->zoom = 16;
