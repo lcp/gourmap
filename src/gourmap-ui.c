@@ -23,6 +23,7 @@ struct GourmapUiPrivate
 	double current_lat;
 	double current_lng;
 	unsigned int zoom;
+	unsigned int radius;
 };
 
 G_DEFINE_TYPE (GourmapUi, gourmap_ui, G_TYPE_OBJECT)
@@ -37,9 +38,12 @@ update_map (GourmapUi *ui, double latitude, double longitude)
 	char *map_html;
 
 	map_html = g_strdup_printf (google_map_template,
-				    latitude,
-				    longitude,
-				    priv->zoom);
+				    latitude,      /* Map Center latitude  */
+				    longitude,     /* Map Center longitude */
+				    priv->zoom,    /* Zoom Level */
+				    latitude,      /* Circle Center latitude  */
+				    longitude,     /* Circle Center longitude */
+				    priv->radius); /* Circle Radius */
 	webkit_web_view_load_string (WEBKIT_WEB_VIEW (priv->web_view),
 				     map_html,
 				     "text/html",
@@ -211,6 +215,7 @@ gourmap_ui_init (GourmapUi *ui)
 	priv->proxy = rest_proxy_new ("http://maps.google.com/maps/api/", FALSE);
 
 	priv->zoom = 16;
+	priv->radius = 850;
 
 	create_map_window (ui);
 
