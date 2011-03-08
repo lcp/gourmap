@@ -34,11 +34,8 @@ CFLAGS="$CFLAGS -Wall"
 # Dependencies
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.14)
 PKG_CHECK_MODULES(GOBJECT, gobject-2.0 >= 2.14)
-PKG_CHECK_MODULES(REST, rest-0.6 rest-extras-0.6)
-PKG_CHECK_MODULES(JSON_GLIB, json-glib-1.0)
 PKG_CHECK_MODULES(WEBKIT, webkit-1.0)
 PKG_CHECK_MODULES(GTK2, gtk+-2.0)
-PKG_CHECK_MODULES(SOUP, libsoup-2.4)
 
 AC_OUTPUT([
         Makefile

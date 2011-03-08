@@ -6,8 +6,6 @@
 #include <glib/gi18n.h>
 #include <webkit/webkit.h>
 
-#include <json-glib/json-glib.h>
-
 #include "google-map-template.h"
 #include "gourmap-ui.h"
 
