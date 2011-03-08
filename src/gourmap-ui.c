@@ -41,9 +41,8 @@ update_map (GourmapUi *ui, double latitude, double longitude)
 				    latitude,      /* Map Center latitude  */
 				    longitude,     /* Map Center longitude */
 				    priv->zoom,    /* Zoom Level */
-				    latitude,      /* Circle Center latitude  */
-				    longitude,     /* Circle Center longitude */
-				    priv->radius); /* Circle Radius */
+				    priv->radius,  /* Circle Radius */
+                                    NULL);
 	webkit_web_view_load_string (WEBKIT_WEB_VIEW (priv->web_view),
 				     map_html,
 				     "text/html",
