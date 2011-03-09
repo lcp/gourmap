@@ -1,5 +1,6 @@
 /* Parameters:
-   (char *) address,
+   (double) latitude,
+   (double) longitude,
    (unsigned int) map_zoom_level,
    (unsigned int) circle_radius,
    (char *) gmap_restaurant_markers
@@ -12,14 +13,13 @@ const char *google_map_template =
 "<link href=\"http://code.google.com/apis/maps/documentation/javascript/examples/default.css\" rel=\"stylesheet\" type=\"text/css\" />"
 "<script type=\"text/javascript\" src=\"http://maps.google.com/maps/api/js?sensor=false\"></script>"
 "<script type=\"text/javascript\">"
-"var geocoder;"
 "var map;"
 "var circle;"
-"var query = '%s';" /* Address to be queried */
 "function initialize() {"
-"	geocoder = new google.maps.Geocoder();"
+"	var myLatlng = new google.maps.LatLng(%.6f, %.6f);" /*Latitude, Longitude*/
 "	var myOptions = {"
 "		zoom: %u," /* Zoom level */
+"		center: myLatlng,"
 "		mapTypeControl: false,"
 "		mapTypeId: google.maps.MapTypeId.ROADMAP,"
 "		streetViewControl: false,"
@@ -30,32 +30,20 @@ const char *google_map_template =
 "		myOptions"
 "	);"
 "	circle = new google.maps.Circle({"
-"	radius: %u," /* Radius of the circle */
-"	map: map,"
+"		center: myLatlng,"
+"		radius: %u," /* Radius of the circle */
+"		map: map,"
 "		fillOpacity: 0.1,"
 "		strokeOpacity: 0.3,"
 "		strokeWeight: 1,"
 "		clickable: false,"
 "	});"
-"	codeAddress ();"
+"	var marker = new google.maps.Marker({"
+"		position: myLatlng,"
+"		map: map,"
+"	});"
 "%s" /* Restaurant Markers */
 "}"
-"function codeAddress() {"
-"	var address = query;"
-"	geocoder.geocode( { 'address': address}, function(results, status) {"
-"		if (status == google.maps.GeocoderStatus.OK) {"
-"			position = results[0].geometry.location;"
-"			map.setCenter(position);"
-"			circle.setCenter(position);"
-"			var marker = new google.maps.Marker({"
-"				map: map,"
-"				position: position"
-"			});"
-"		} else {"
-"			alert(\"Geocode was not successful for the following reason: \" + status);"
-"		}"
-"	});"
-"};"
 "function attachInfowindow(marker, content) {"
 "	var infowindow = new google.maps.InfoWindow({"
 "		content: content"

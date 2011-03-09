@@ -6,8 +6,12 @@
 #include <glib/gi18n.h>
 #include <webkit/webkit.h>
 
+#include <rest/rest-proxy.h>
+#include <json-glib/json-glib.h>
+
 #include "google-map-template.h"
 #include "gourmap-ui.h"
+#include "gourmap-util.h"
 
 struct GourmapUiPrivate
 {
@@ -15,7 +19,9 @@ struct GourmapUiPrivate
 	GtkWidget *map;
 	GtkWidget *addr_entry;
 	WebKitWebView *web_view;
-	char *current_addr;
+	RestProxy *proxy;
+	double current_lat;
+	double current_lng;
 	unsigned int zoom;
 	unsigned int radius;
 };
@@ -26,13 +32,16 @@ G_DEFINE_TYPE (GourmapUi, gourmap_ui, G_TYPE_OBJECT)
                         GOURMAP_TYPE_UI, GourmapUiPrivate))
 
 static void
-update_map (GourmapUi *ui, const gchar *addr)
+update_map (GourmapUi *ui,
+	    const double latitude,
+	    const double longitude)
 {
 	GourmapUiPrivate *priv = GET_PRIVATE (ui);
 	char *map_html;
 
 	map_html = g_strdup_printf (google_map_template,
-				    addr,	   /* Address Query */
+				    latitude,      /* Map Center latitude  */
+				    longitude,     /* Map Center longitude */
 				    priv->zoom,    /* Zoom Level */
 				    priv->radius,  /* Circle Radius */
                                     NULL);
@@ -43,10 +52,76 @@ update_map (GourmapUi *ui, const gchar *addr)
 				     "");
 	g_free (map_html);
 
-	if (g_strcmp0 (priv->current_addr, addr)) {
-		g_free (priv->current_addr);
-		priv->current_addr = g_strdup (addr);
+	priv->current_lat = latitude;
+	priv->current_lng = longitude;
+}
+
+static void
+_got_gmap_geocode (RestProxyCall *call,
+		   GError        *error,
+		   GObject       *weak_object,
+		   gpointer       userdata)
+{
+	GourmapUi *ui = GOURMAP_UI (weak_object);
+	JsonNode *root, *node;
+	JsonObject *obj;
+	JsonArray *array;
+	double lat, lng;
+
+	root = json_node_from_call (call);
+	if (!root) {
+		g_message ("Not a vaild json");
+		/* TODO notification for user */
+		return;
 	}
+
+	/* interpret json */
+	/* http://code.google.com/intl/zh-TW/apis/maps/documentation/geocoding/index.html#JSON */
+	obj = json_node_get_object (root);
+	if (!json_object_has_member (obj, "results")) {
+		g_message ("No results");
+		/* TODO notification for user */
+		return;
+	}
+	node = json_object_get_member (obj, "results");
+	array = json_node_get_array (node);
+
+	/* Always take the first result :-p */
+	node = json_array_get_element (array, 0);
+	obj = json_node_get_object (node);
+	node = json_object_get_member (obj, "geometry");
+	obj = json_node_get_object (node);
+	node = json_object_get_member (obj, "location");
+	obj = json_node_get_object (node);
+
+	lat = json_object_get_double_member (obj, "lat");
+	lng = json_object_get_double_member (obj, "lng");
+
+	g_debug ("lat = %.6f, lng = %.6f", lat, lng);
+
+	update_map (ui, lat, lng);
+}
+
+static gboolean
+request_geocode (GourmapUi *ui, const char *address)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+	RestProxyCall *call;
+
+	if (!priv->proxy || !address)
+		return FALSE;
+
+	call = rest_proxy_new_call (priv->proxy);
+	rest_proxy_call_set_function (call, "geocode/json");
+
+	rest_proxy_call_add_params (call,
+				    "address", address,
+				    "sensor", "false",
+				    NULL);
+
+	rest_proxy_call_async (call, _got_gmap_geocode, (GObject*)ui, NULL, NULL);
+
+	return TRUE;
 }
 
 static void
@@ -65,9 +140,9 @@ activate_addr_entry_cb (GtkWidget *entry, gpointer data)
 	addr = gtk_entry_get_text (GTK_ENTRY (priv->addr_entry));
 
 	if (addr[0] == '\0') {
-		update_map (ui, priv->current_addr);
+		update_map (ui, priv->current_lat, priv->current_lng);
 	} else {
-		update_map (ui, addr);
+		request_geocode (ui, addr);
 	}
 }
 
@@ -90,7 +165,8 @@ create_map_window (GourmapUi *ui)
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
 	gtk_container_add (GTK_CONTAINER (priv->map), GTK_WIDGET (priv->web_view));
-	update_map (ui, g_strdup ("Taipei"));
+	/* Default location: Taipei 101 building */
+	update_map (ui, 25.033867,121.564126);
 
 	gtk_box_pack_start (GTK_BOX (vbox), priv->map, TRUE, TRUE, 0);
 
@@ -139,7 +215,7 @@ gourmap_ui_init (GourmapUi *ui)
 
 	priv = GET_PRIVATE (ui);
 
-	priv->current_addr = NULL;
+	priv->proxy = rest_proxy_new ("http://maps.google.com/maps/api/", FALSE);
 	priv->zoom = 16;
 	priv->radius = 850;
 
