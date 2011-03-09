@@ -19,6 +19,8 @@ INCLUDES = \
 libexec_PROGRAMS = gourmap
 
 gourmap_SOURCES =						\
+	gourmap-poi.h						\
+	gourmap-poi.c						\
 	gourmap-ui.h						\
 	gourmap-ui.c						\
 	gourmap-main.c
@@ -27,7 +29,8 @@ gourmap_LDADD =							\
 	$(GTK2_LIBS)						\
 	$(GOBJECT_LIBS)						\
 	$(WEBKIT_LIBS)						\
-	$(GLIB_LIBS)
+	$(GLIB_LIBS)						\
+	-lm
 
 clean-local :
 	rm -f *~
