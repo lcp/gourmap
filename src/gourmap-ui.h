@@ -16,17 +16,17 @@ typedef struct GourmapUiPrivate GourmapUiPrivate;
 
 typedef struct
 {
-        GObject parent;
-        GourmapUiPrivate        *priv;
+	GObject parent;
+	GourmapUiPrivate	*priv;
 } GourmapUi;
 
 typedef struct
 {
-        GObjectClass             parent_class;
+	GObjectClass		 parent_class;
 } GourmapUiClass;
 
-GType            gourmap_ui_get_type            (void);
-GourmapUi       *gourmap_ui_new                 (void);
+GType		 gourmap_ui_get_type	(void);
+GourmapUi	*gourmap_ui_new		(void);
 
 G_END_DECLS
 

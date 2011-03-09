@@ -32,7 +32,7 @@ update_map (GourmapUi *ui, const gchar *addr)
 	char *map_html;
 
 	map_html = g_strdup_printf (google_map_template,
-				    addr,
+				    addr,	   /* Address Query */
 				    priv->zoom,    /* Zoom Level */
 				    priv->radius,  /* Circle Radius */
                                     NULL);
