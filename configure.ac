@@ -42,5 +42,6 @@ PKG_CHECK_MODULES(JSON_GLIB, json-glib-1.0)
 AC_OUTPUT([
         Makefile
         src/Makefile
+	data/Makefile
 	po/Makefile.in
 ])
