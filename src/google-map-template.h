@@ -1,6 +1,5 @@
 /* Parameters:
-   (double) map_center_latitude,
-   (double) map_center_longitude,
+   (char *) address,
    (unsigned int) map_zoom_level,
    (unsigned int) circle_radius,
    (char *) gmap_restaurant_markers
@@ -16,11 +15,11 @@ const char *google_map_template =
 "var geocoder;"
 "var map;"
 "var circle;"
-"var query = '%s';"
+"var query = '%s';" /* Address to be queried */
 "function initialize() {"
 "	geocoder = new google.maps.Geocoder();"
 "	var myOptions = {"
-"		zoom: %u,"
+"		zoom: %u," /* Zoom level */
 "		mapTypeControl: false,"
 "		mapTypeId: google.maps.MapTypeId.ROADMAP,"
 "		streetViewControl: false,"
@@ -31,7 +30,7 @@ const char *google_map_template =
 "		myOptions"
 "	);"
 "	circle = new google.maps.Circle({"
-"	radius: %u,"
+"	radius: %u," /* Radius of the circle */
 "	map: map,"
 "		fillOpacity: 0.1,"
 "		strokeOpacity: 0.3,"
@@ -39,7 +38,7 @@ const char *google_map_template =
 "		clickable: false,"
 "	});"
 "	codeAddress ();"
-"%s"
+"%s" /* Restaurant Markers */
 "}"
 "function codeAddress() {"
 "	var address = query;"
