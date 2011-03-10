@@ -12,7 +12,7 @@ int
 main (int argc, char **argv)
 {
 	GourmapCoord *coord;
-	const char *poi_db_filename;
+	const char *poi_db_filename = NULL;
 	GOptionContext *context;
 	const GOptionEntry options[] = {
 		{ "import", 'i', 0, G_OPTION_ARG_STRING, &poi_db_filename,
