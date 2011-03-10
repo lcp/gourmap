@@ -11,10 +11,12 @@
 
 #include "google-map-template.h"
 #include "gourmap-ui.h"
+#include "gourmap-poi.h"
 #include "gourmap-util.h"
 
 enum {
 	UI_ADDR_UPDATED,
+	UI_MAP_REDRAW,
 	LAST_SIGNAL
 };
 
@@ -56,23 +58,28 @@ gourmap_ui_set_radius (GourmapUi    *ui,
 void
 gourmap_ui_update_map (GourmapUi    *ui,
 		       const double  latitude,
-		       const double  longitude)
+		       const double  longitude,
+		       GList        *poi_list)
 {
 	GourmapUiPrivate *priv = GET_PRIVATE (ui);
-	char *map_html;
+	char *map_html, *poi_markers = NULL;
+
+	if (poi_list != NULL) {
+	}
 
 	map_html = g_strdup_printf (google_map_template,
 				    latitude,      /* Map Center latitude  */
 				    longitude,     /* Map Center longitude */
 				    priv->zoom,    /* Zoom Level */
 				    priv->radius,  /* Circle Radius */
-                                    NULL);
+                                    poi_markers);
 	webkit_web_view_load_string (WEBKIT_WEB_VIEW (priv->web_view),
 				     map_html,
 				     "text/html",
 				     "UTF-8",
 				     "");
 	g_free (map_html);
+	g_free (poi_markers);
 
 	priv->current_lat = latitude;
 	priv->current_lng = longitude;
@@ -94,7 +101,7 @@ activate_addr_entry_cb (GtkWidget *entry, gpointer data)
 	addr = gtk_entry_get_text (GTK_ENTRY (priv->addr_entry));
 
 	if (addr[0] == '\0') {
-		gourmap_ui_update_map (ui, priv->current_lat, priv->current_lng);
+		g_signal_emit (G_OBJECT (ui), signals[UI_MAP_REDRAW], 0, G_TYPE_NONE);
 	} else {
 		g_signal_emit (G_OBJECT (ui), signals[UI_ADDR_UPDATED], 0, addr);
 	}
@@ -120,7 +127,7 @@ create_map_window (GourmapUi *ui)
 					GTK_POLICY_AUTOMATIC);
 	gtk_container_add (GTK_CONTAINER (priv->map), GTK_WIDGET (priv->web_view));
 	/* Default location: Taipei 101 building */
-	gourmap_ui_update_map (ui, 25.033867,121.564126);
+	gourmap_ui_update_map (ui, 25.033867, 121.564126, NULL);
 
 	gtk_box_pack_start (GTK_BOX (vbox), priv->map, TRUE, TRUE, 0);
 
@@ -176,6 +183,8 @@ gourmap_ui_init (GourmapUi *ui)
 
 	gtk_widget_grab_focus (priv->addr_entry);
 	gtk_widget_show_all (priv->main_window);
+
+	g_signal_emit (G_OBJECT (ui), signals[UI_MAP_REDRAW], 0, G_TYPE_NONE);
 }
 
 static void
@@ -200,6 +209,14 @@ gourmap_ui_class_init (GourmapUiClass *klass)
 			      NULL, NULL,
 			      g_cclosure_marshal_VOID__STRING,
 			      G_TYPE_NONE, 1, G_TYPE_STRING);
+	signals[UI_MAP_REDRAW] =
+		g_signal_new ("ui-map-redraw",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_LAST,
+			      G_STRUCT_OFFSET (GourmapUiClass, ui_map_redraw),
+			      NULL, NULL,
+			      g_cclosure_marshal_VOID__VOID,
+			      G_TYPE_NONE, 0, G_TYPE_NONE);
 }
 
 GourmapUi *

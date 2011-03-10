@@ -1,6 +1,7 @@
 #ifndef __GOURMAP_UI_H__
 #define __GOURMAP_UI_H__
 
+#include <glib.h>
 #include <glib-object.h>
 
 G_BEGIN_DECLS
@@ -25,6 +26,7 @@ typedef struct
 	GObjectClass		 parent_class;
 
 	void			(*ui_addr_updated) (GourmapUi *ui, const char *addr);
+	void			(*ui_map_redraw) (GourmapUi *ui);
 } GourmapUiClass;
 
 GType		 gourmap_ui_get_type	(void);
@@ -36,7 +38,8 @@ void		 gourmap_ui_set_radius	(GourmapUi	*ui,
 					 unsigned int	 radius);
 void		 gourmap_ui_update_map	(GourmapUi	*ui,
 					 const double	 latitude,
-					 const double	 longitude);
+					 const double	 longitude,
+					 GList		*poi_list);
 G_END_DECLS
 
 #endif /* __GOURMAP_UI_H__ */
