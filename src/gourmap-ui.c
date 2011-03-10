@@ -27,6 +27,7 @@ struct GourmapUiPrivate
 	GtkWidget *main_window;
 	GtkWidget *map;
 	GtkWidget *addr_entry;
+	GtkWidget *treeview;
 	WebKitWebView *web_view;
 	unsigned int zoom;
 	unsigned int radius;
@@ -149,13 +150,17 @@ static void
 create_map_window (GourmapUi *ui)
 {
 	GourmapUiPrivate *priv;
-	GtkWidget *vbox;
+	GtkWidget *hbox;
+	GtkWidget *vbox1, *vbox2;
 	GtkWidget *toolbar;
 	GtkWidget *addr_label;
+	GtkWidget *rand_button;
 	GtkToolItem *item;
 
 	priv = GET_PRIVATE (ui);
-	vbox = gtk_vbox_new (FALSE, 0);
+	hbox = gtk_hbox_new (FALSE, 0);
+	vbox1 = gtk_vbox_new (FALSE, 0);
+	vbox2 = gtk_vbox_new (FALSE, 0);
 
 	/* map */
 	priv->map = gtk_scrolled_window_new (NULL, NULL);
@@ -165,7 +170,22 @@ create_map_window (GourmapUi *ui)
 					GTK_POLICY_AUTOMATIC);
 	gtk_container_add (GTK_CONTAINER (priv->map), GTK_WIDGET (priv->web_view));
 
-	gtk_box_pack_start (GTK_BOX (vbox), priv->map, TRUE, TRUE, 0);
+
+	/* sidebar */
+	vbox2 = gtk_vbox_new (FALSE, 0);
+
+	/* restaurant list */
+	/* TODO treeview list for restaurants */
+	priv->treeview = gtk_label_new ("Restaurnat List");
+	gtk_box_pack_start (GTK_BOX (vbox2), priv->treeview, TRUE, TRUE, 0);
+
+	/* random button */
+	rand_button = gtk_button_new_with_label (_("Random Choose!"));
+	/* TODO connect the clicked signal */
+	gtk_box_pack_start (GTK_BOX (vbox2), rand_button, FALSE, FALSE, 0);
+
+	gtk_box_pack_start (GTK_BOX (hbox), priv->map, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (hbox), vbox2, FALSE, FALSE, 0);
 
 	/* address */
 	toolbar = gtk_toolbar_new ();
@@ -191,7 +211,8 @@ create_map_window (GourmapUi *ui)
 			  (gpointer) ui);
 	gtk_toolbar_insert (GTK_TOOLBAR (toolbar), item, -1);
 
-	gtk_box_pack_start (GTK_BOX (vbox), toolbar, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (vbox1), hbox, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (vbox1), toolbar, FALSE, FALSE, 0);
 
 	/* main window */
 	priv->main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -202,7 +223,7 @@ create_map_window (GourmapUi *ui)
 			  G_CALLBACK (destroy_cb),
 			  NULL);
 
-	gtk_container_add (GTK_CONTAINER (priv->main_window), vbox);
+	gtk_container_add (GTK_CONTAINER (priv->main_window), vbox1);
 }
 
 static void
