@@ -137,6 +137,20 @@ gourmap_coord_map_redraw_cb (GourmapUi    *ui,
 }
 
 static void
+gourmap_coord_random_button_cb (GourmapUi    *ui,
+				GourmapCoord *coord)
+{
+	GourmapCoordPrivate *priv = GET_PRIVATE (coord);
+
+	g_debug ("random button clicked");
+
+	if (priv->poi_list == NULL)
+		return;
+
+	/* TODO select a restaurant randomly */
+}
+
+static void
 gourmap_coord_init (GourmapCoord *coord)
 {
 	GourmapCoordPrivate *priv;
@@ -164,6 +178,11 @@ gourmap_coord_init (GourmapCoord *coord)
 			  "ui-map-redraw",
 			  G_CALLBACK (gourmap_coord_map_redraw_cb),
 			  (gpointer) coord);
+	g_signal_connect (G_OBJECT (priv->ui),
+			  "ui-random",
+			  G_CALLBACK (gourmap_coord_random_button_cb),
+			  (gpointer) coord);
+
 	gourmap_coord_map_redraw_cb (priv->ui, coord);
 }
 
