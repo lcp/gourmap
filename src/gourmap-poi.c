@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
 #include <stdio.h>
 #include <math.h>
 #include <glib.h>
@@ -97,9 +101,19 @@ static void
 gourmap_poi_finalize (GObject *object)
 {
 	GourmapPoiPrivate *priv = GET_PRIVATE (object);
+	Restaurant *rest;
+	GList *list_i;
 
-	/*TODO free all elements in priv->restaurants*/
+	list_i = priv->restaurants;
+	while (list_i) {
+		rest = (Restaurant *)list_i->data;
+		g_free (rest->name);
+		g_free (rest->address);
+		g_free (rest);
+		list_i = list_i->next;
+	}
 	g_list_free (priv->restaurants);
+	G_OBJECT_CLASS (gourmap_poi_parent_class)->finalize (object);
 }
 
 static void
