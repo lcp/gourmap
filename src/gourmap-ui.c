@@ -164,8 +164,6 @@ create_map_window (GourmapUi *ui)
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
 	gtk_container_add (GTK_CONTAINER (priv->map), GTK_WIDGET (priv->web_view));
-	/* Default location: Taipei 101 building */
-	gourmap_ui_update_map (ui, 25.033867, 121.564126, NULL);
 
 	gtk_box_pack_start (GTK_BOX (vbox), priv->map, TRUE, TRUE, 0);
 
@@ -221,8 +219,6 @@ gourmap_ui_init (GourmapUi *ui)
 
 	gtk_widget_grab_focus (priv->addr_entry);
 	gtk_widget_show_all (priv->main_window);
-
-	g_signal_emit (G_OBJECT (ui), signals[UI_MAP_REDRAW], 0);
 }
 
 static void
