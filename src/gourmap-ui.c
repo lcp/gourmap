@@ -139,7 +139,7 @@ activate_addr_entry_cb (GtkWidget *entry, gpointer data)
 	addr = gtk_entry_get_text (GTK_ENTRY (priv->addr_entry));
 
 	if (addr[0] == '\0') {
-		g_signal_emit (G_OBJECT (ui), signals[UI_MAP_REDRAW], 0, G_TYPE_NONE);
+		g_signal_emit (G_OBJECT (ui), signals[UI_MAP_REDRAW], 0);
 	} else {
 		g_signal_emit (G_OBJECT (ui), signals[UI_ADDR_UPDATED], 0, addr);
 	}
@@ -222,7 +222,7 @@ gourmap_ui_init (GourmapUi *ui)
 	gtk_widget_grab_focus (priv->addr_entry);
 	gtk_widget_show_all (priv->main_window);
 
-	g_signal_emit (G_OBJECT (ui), signals[UI_MAP_REDRAW], 0, G_TYPE_NONE);
+	g_signal_emit (G_OBJECT (ui), signals[UI_MAP_REDRAW], 0);
 }
 
 static void
