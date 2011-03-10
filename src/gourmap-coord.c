@@ -20,6 +20,7 @@ struct GourmapCoordPrivate
 	double current_lng;
 	unsigned int zoom;
 	unsigned int radius;
+	GList *poi_list;
 };
 
 G_DEFINE_TYPE (GourmapCoord, gourmap_coord, G_TYPE_OBJECT)
@@ -80,7 +81,15 @@ _got_gmap_geocode (RestProxyCall *call,
 
 	g_debug ("lat = %.6f, lng = %.6f", lat, lng);
 
-	gourmap_ui_update_map (priv->ui, lat, lng);
+	if (priv->current_lat != lat || priv->current_lng != lng) {
+		g_list_free (priv->poi_list);
+		priv->poi_list = gourmap_poi_find_poi (priv->poi,
+						       lat,
+						       lng,
+						       priv->radius);
+	}
+
+	gourmap_ui_update_map (priv->ui, lat, lng, priv->poi_list);
 
 	priv->current_lat = lat;
 	priv->current_lng = lng;
@@ -109,25 +118,51 @@ gourmap_coord_addr_updated_cb (GourmapUi    *ui,
 }
 
 static void
+gourmap_coord_map_redraw_cb (GourmapUi    *ui,
+			     GourmapCoord *coord)
+{
+	GourmapCoordPrivate *priv = GET_PRIVATE (coord);
+
+	if (priv->poi_list == NULL) {
+		priv->poi_list = gourmap_poi_find_poi (priv->poi,
+						       priv->current_lat,
+						       priv->current_lng,
+						       priv->radius);
+	}
+
+	gourmap_ui_update_map (priv->ui,
+			       priv->current_lat,
+			       priv->current_lng,
+			       priv->poi_list);
+}
+
+static void
 gourmap_coord_init (GourmapCoord *coord)
 {
 	GourmapCoordPrivate *priv;
 	priv = GET_PRIVATE (coord);
 
 	priv->proxy = rest_proxy_new ("http://maps.google.com/maps/api/", FALSE);
+	priv->current_lat = 25.033867;
+	priv->current_lng = 121.564126;
 	priv->zoom = 16;
 	priv->radius = 850;
 
 	priv->db_file = NULL;
 	priv->poi = gourmap_poi_new ();
+	priv->poi_list = NULL;
 
 	priv->ui = gourmap_ui_new ();
+	gourmap_ui_set_zoom (priv->ui, priv->zoom);
+	gourmap_ui_set_radius (priv->ui, priv->radius);
 	g_signal_connect (G_OBJECT (priv->ui),
 			  "ui-addr-updated",
 			  G_CALLBACK (gourmap_coord_addr_updated_cb),
 			  (gpointer) coord);
-	gourmap_ui_set_zoom (priv->ui, priv->zoom);
-	gourmap_ui_set_radius (priv->ui, priv->radius);
+	g_signal_connect (G_OBJECT (priv->ui),
+			  "ui-map-redraw",
+			  G_CALLBACK (gourmap_coord_map_redraw_cb),
+			  (gpointer) coord);
 }
 
 static void
