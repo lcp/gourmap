@@ -28,8 +28,6 @@ struct GourmapUiPrivate
 	GtkWidget *map;
 	GtkWidget *addr_entry;
 	WebKitWebView *web_view;
-	double current_lat;
-	double current_lng;
 	unsigned int zoom;
 	unsigned int radius;
 };
@@ -123,9 +121,6 @@ gourmap_ui_update_map (GourmapUi    *ui,
 				     "");
 	g_free (map_html);
 	g_free (poi_markers);
-
-	priv->current_lat = latitude;
-	priv->current_lng = longitude;
 }
 
 static void
