@@ -27,6 +27,8 @@ gourmap_SOURCES =						\
 	gourmap-poi.c						\
 	gourmap-ui.h						\
 	gourmap-ui.c						\
+	gourmap-coord.h						\
+	gourmap-coord.c						\
 	gourmap-main.c
 
 gourmap_LDADD =							\
