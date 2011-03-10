@@ -13,13 +13,19 @@
 #include "gourmap-ui.h"
 #include "gourmap-util.h"
 
+enum {
+	UI_ADDR_UPDATED,
+	LAST_SIGNAL
+};
+
+static int signals[LAST_SIGNAL] = { 0 };
+
 struct GourmapUiPrivate
 {
 	GtkWidget *main_window;
 	GtkWidget *map;
 	GtkWidget *addr_entry;
 	WebKitWebView *web_view;
-	RestProxy *proxy;
 	double current_lat;
 	double current_lng;
 	unsigned int zoom;
@@ -31,10 +37,10 @@ G_DEFINE_TYPE (GourmapUi, gourmap_ui, G_TYPE_OBJECT)
 #define GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
                         GOURMAP_TYPE_UI, GourmapUiPrivate))
 
-static void
-update_map (GourmapUi *ui,
-	    const double latitude,
-	    const double longitude)
+void
+gourmap_ui_update_map (GourmapUi    *ui,
+		       const double  latitude,
+		       const double  longitude)
 {
 	GourmapUiPrivate *priv = GET_PRIVATE (ui);
 	char *map_html;
@@ -57,74 +63,6 @@ update_map (GourmapUi *ui,
 }
 
 static void
-_got_gmap_geocode (RestProxyCall *call,
-		   GError        *error,
-		   GObject       *weak_object,
-		   gpointer       userdata)
-{
-	GourmapUi *ui = GOURMAP_UI (weak_object);
-	JsonNode *root, *node;
-	JsonObject *obj;
-	JsonArray *array;
-	double lat, lng;
-
-	root = json_node_from_call (call);
-	if (!root) {
-		g_message ("Not a vaild json");
-		/* TODO notification for user */
-		return;
-	}
-
-	/* interpret json */
-	/* http://code.google.com/intl/zh-TW/apis/maps/documentation/geocoding/index.html#JSON */
-	obj = json_node_get_object (root);
-	if (!json_object_has_member (obj, "results")) {
-		g_message ("No results");
-		/* TODO notification for user */
-		return;
-	}
-	node = json_object_get_member (obj, "results");
-	array = json_node_get_array (node);
-
-	/* Always take the first result :-p */
-	node = json_array_get_element (array, 0);
-	obj = json_node_get_object (node);
-	node = json_object_get_member (obj, "geometry");
-	obj = json_node_get_object (node);
-	node = json_object_get_member (obj, "location");
-	obj = json_node_get_object (node);
-
-	lat = json_object_get_double_member (obj, "lat");
-	lng = json_object_get_double_member (obj, "lng");
-
-	g_debug ("lat = %.6f, lng = %.6f", lat, lng);
-
-	update_map (ui, lat, lng);
-}
-
-static gboolean
-request_geocode (GourmapUi *ui, const char *address)
-{
-	GourmapUiPrivate *priv = GET_PRIVATE (ui);
-	RestProxyCall *call;
-
-	if (!priv->proxy || !address)
-		return FALSE;
-
-	call = rest_proxy_new_call (priv->proxy);
-	rest_proxy_call_set_function (call, "geocode/json");
-
-	rest_proxy_call_add_params (call,
-				    "address", address,
-				    "sensor", "false",
-				    NULL);
-
-	rest_proxy_call_async (call, _got_gmap_geocode, (GObject*)ui, NULL, NULL);
-
-	return TRUE;
-}
-
-static void
 destroy_cb (GtkWidget *widget, gpointer data)
 {
     gtk_main_quit ();
@@ -140,9 +78,9 @@ activate_addr_entry_cb (GtkWidget *entry, gpointer data)
 	addr = gtk_entry_get_text (GTK_ENTRY (priv->addr_entry));
 
 	if (addr[0] == '\0') {
-		update_map (ui, priv->current_lat, priv->current_lng);
+		gourmap_ui_update_map (ui, priv->current_lat, priv->current_lng);
 	} else {
-		request_geocode (ui, addr);
+		g_signal_emit (G_OBJECT (ui), signals[UI_ADDR_UPDATED], 0, addr);
 	}
 }
 
@@ -166,7 +104,7 @@ create_map_window (GourmapUi *ui)
 					GTK_POLICY_AUTOMATIC);
 	gtk_container_add (GTK_CONTAINER (priv->map), GTK_WIDGET (priv->web_view));
 	/* Default location: Taipei 101 building */
-	update_map (ui, 25.033867,121.564126);
+	gourmap_ui_update_map (ui, 25.033867,121.564126);
 
 	gtk_box_pack_start (GTK_BOX (vbox), priv->map, TRUE, TRUE, 0);
 
@@ -215,7 +153,6 @@ gourmap_ui_init (GourmapUi *ui)
 
 	priv = GET_PRIVATE (ui);
 
-	priv->proxy = rest_proxy_new ("http://maps.google.com/maps/api/", FALSE);
 	priv->zoom = 16;
 	priv->radius = 850;
 
@@ -226,10 +163,27 @@ gourmap_ui_init (GourmapUi *ui)
 }
 
 static void
+gourmap_ui_finalize (GObject *object)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (object);
+	G_OBJECT_CLASS(gourmap_ui_parent_class)->finalize(object);
+}
+
+static void
 gourmap_ui_class_init (GourmapUiClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	g_type_class_add_private (klass, sizeof (GourmapUiPrivate));
+	object_class->finalize = gourmap_ui_finalize;
+
+	signals[UI_ADDR_UPDATED] =
+		g_signal_new ("ui-addr-updated",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_LAST,
+			      G_STRUCT_OFFSET (GourmapUiClass, ui_addr_updated),
+			      NULL, NULL,
+			      g_cclosure_marshal_VOID__STRING,
+			      G_TYPE_NONE, 1, G_TYPE_STRING);
 }
 
 GourmapUi *

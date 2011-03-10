@@ -16,18 +16,22 @@ typedef struct GourmapUiPrivate GourmapUiPrivate;
 
 typedef struct
 {
-	GObject parent;
+	GObject			 parent;
 	GourmapUiPrivate	*priv;
 } GourmapUi;
 
 typedef struct
 {
 	GObjectClass		 parent_class;
+
+	void			(*ui_addr_updated) (GourmapUi *ui, const char *addr);
 } GourmapUiClass;
 
 GType		 gourmap_ui_get_type	(void);
 GourmapUi	*gourmap_ui_new		(void);
-
+void		 gourmap_ui_update_map	(GourmapUi	*ui,
+					 const double	 latitude,
+					 const double	 longitude);
 G_END_DECLS
 
 #endif /* __GOURMAP_UI_H__ */
