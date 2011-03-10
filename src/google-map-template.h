@@ -1,3 +1,6 @@
+#ifndef __GOOGLE_MAP_TEMPLATE_H__
+#define __GOOGLE_MAP_TEMPLATE_H__
+
 /* Parameters:
    (double) latitude,
    (double) longitude,
@@ -81,3 +84,5 @@ const char *gmap_restaurant_markers =
 "		attachInfowindow (marker, content);"
 "	}"
 "";
+
+#endif /* __GOOGLE_MAP_TEMPLATE_H__ */
