@@ -35,6 +35,9 @@ main (int argc, char **argv)
 	g_option_context_free (context);
 
 	coord = gourmap_coord_new ();
+
+	if (poi_db_filename == NULL)
+		poi_db_filename = PACKAGE_DATA_DIR"/gourmap/poi.db";
 	gourmap_coord_import_poi_db (coord, poi_db_filename);
 
 	gtk_main ();
