@@ -29,6 +29,11 @@ typedef struct
 
 GType		 gourmap_ui_get_type	(void);
 GourmapUi	*gourmap_ui_new		(void);
+
+void		 gourmap_ui_set_zoom	(GourmapUi	*ui,
+					 unsigned int	 zoom);
+void		 gourmap_ui_set_radius	(GourmapUi	*ui,
+					 unsigned int	 radius);
 void		 gourmap_ui_update_map	(GourmapUi	*ui,
 					 const double	 latitude,
 					 const double	 longitude);

@@ -38,6 +38,22 @@ G_DEFINE_TYPE (GourmapUi, gourmap_ui, G_TYPE_OBJECT)
                         GOURMAP_TYPE_UI, GourmapUiPrivate))
 
 void
+gourmap_ui_set_zoom (GourmapUi    *ui,
+		     unsigned int  zoom)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+	priv->zoom = zoom;
+}
+
+void
+gourmap_ui_set_radius (GourmapUi    *ui,
+		       unsigned int  radius)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+	priv->radius = radius;
+}
+
+void
 gourmap_ui_update_map (GourmapUi    *ui,
 		       const double  latitude,
 		       const double  longitude)
