@@ -55,6 +55,46 @@ gourmap_ui_set_radius (GourmapUi    *ui,
 	priv->radius = radius;
 }
 
+char *
+construct_poi_markers (GList *poi_list)
+{
+	char *poi_array = NULL;
+	char *poi_markers = NULL;
+	GList *list_i;
+	Restaurant *rest;
+
+	list_i = poi_list;
+	while (list_i) {
+		char *prev;
+		rest = (Restaurant *)list_i->data;
+		if (poi_array != NULL) {
+			prev = poi_array;
+			poi_array = g_strdup_printf ("%s [\'%s\', %.6f, %.6f],",
+						     prev,
+						     rest->name,
+						     rest->latitude,
+						     rest->longitude);
+			g_free (prev);
+		} else {
+			poi_array = g_strdup_printf ("[\'%s\', %.6f, %.6f],",
+						     rest->name,
+						     rest->latitude,
+						     rest->longitude);
+		}
+		list_i = list_i->next;
+	}
+
+	if (poi_array == NULL)
+		return NULL;
+
+	poi_markers = g_strdup_printf (gmap_restaurant_markers,
+				       poi_array);
+
+	g_free (poi_array);
+
+	return poi_markers;
+}
+
 void
 gourmap_ui_update_map (GourmapUi    *ui,
 		       const double  latitude,
@@ -65,6 +105,7 @@ gourmap_ui_update_map (GourmapUi    *ui,
 	char *map_html, *poi_markers = NULL;
 
 	if (poi_list != NULL) {
+		poi_markers = construct_poi_markers (poi_list);
 	}
 
 	map_html = g_strdup_printf (google_map_template,
