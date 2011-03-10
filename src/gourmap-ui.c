@@ -198,7 +198,7 @@ create_map_window (GourmapUi *ui)
 	gtk_box_pack_start (GTK_BOX (vbox2), priv->treeview, TRUE, TRUE, 0);
 
 	/* random button */
-	priv->rand_button = gtk_button_new_with_label (_("Random Choose!"));
+	priv->rand_button = gtk_button_new_with_label (_("Random Selection!"));
 	g_signal_connect (G_OBJECT (priv->rand_button),
 			  "clicked",
 			  G_CALLBACK (random_button_cb),
