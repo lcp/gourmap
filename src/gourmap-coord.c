@@ -126,6 +126,8 @@ gourmap_coord_init (GourmapCoord *coord)
 			  "ui-addr-updated",
 			  G_CALLBACK (gourmap_coord_addr_updated_cb),
 			  (gpointer) coord);
+	gourmap_ui_set_zoom (priv->ui, priv->zoom);
+	gourmap_ui_set_radius (priv->ui, priv->radius);
 }
 
 static void
