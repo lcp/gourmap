@@ -59,13 +59,12 @@ const char *google_map_template =
 "";
 
 /* Parameters:
-   (char *) restaurant_name,
-   (double) restaurant_latitude,
-   (double) restaurant_longitude,
+   (char *) array_of_locations
+      format: ['name_1', latitude_1, longitude_1], ['name_2', latitude_2, longitude_2], ...
 */
 const char *gmap_restaurant_markers =
 "	var restaurants = ["
-"		['%s', %0.6f, %0.6f],"
+"		%s"
 "	];"
 "	for (var i = 0; i < restaurants.length; i++) {"
 "		var restaurant = restaurants[i];"
