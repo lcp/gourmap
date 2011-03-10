@@ -60,7 +60,7 @@ const char *google_map_template =
 
 /* Parameters:
    (char *) array_of_locations
-      format: ['name_1', latitude_1, longitude_1], ['name_2', latitude_2, longitude_2], ...
+      format: ['name_1', latitude_1, longitude_1, address_1], ['name_2', latitude_2, longitude_2, address_2], ...
 */
 const char *gmap_restaurant_markers =
 "	var restaurants = ["
@@ -79,7 +79,7 @@ const char *gmap_restaurant_markers =
 "			icon: image,"
 "			title: restaurant[0],"
 "		});"
-"		var content = '<b>' + restaurant[0] + '</b>';"
+"		var content = '<b>' + restaurant[0] + '</b><br>' + restaurant[3];"
 "		attachInfowindow (marker, content);"
 "	}"
 "";

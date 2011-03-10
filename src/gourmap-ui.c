@@ -69,17 +69,19 @@ construct_poi_markers (GList *poi_list)
 		rest = (Restaurant *)list_i->data;
 		if (poi_array != NULL) {
 			prev = poi_array;
-			poi_array = g_strdup_printf ("%s [\'%s\', %.6f, %.6f],",
+			poi_array = g_strdup_printf ("%s [\'%s\', %.6f, %.6f, \'%s\'],",
 						     prev,
 						     rest->name,
 						     rest->latitude,
-						     rest->longitude);
+						     rest->longitude,
+						     rest->address);
 			g_free (prev);
 		} else {
-			poi_array = g_strdup_printf ("[\'%s\', %.6f, %.6f],",
+			poi_array = g_strdup_printf ("[\'%s\', %.6f, %.6f, \'%s\'],",
 						     rest->name,
 						     rest->latitude,
-						     rest->longitude);
+						     rest->longitude,
+						     rest->address);
 		}
 		list_i = list_i->next;
 	}
