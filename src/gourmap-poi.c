@@ -29,6 +29,9 @@ gourmap_poi_import_db (GourmapPoi *poi,
 	GKeyFile *db_file = g_key_file_new ();
 	char **names;
 
+	if (db_filename == NULL)
+		return FALSE;
+
 	if (!g_key_file_load_from_file (db_file, db_filename, G_KEY_FILE_NONE, NULL)) {
 		g_warning ("Failed to open data file: %s", db_filename);
 		return FALSE;
