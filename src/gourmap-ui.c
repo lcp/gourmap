@@ -17,6 +17,7 @@
 enum {
 	UI_ADDR_UPDATED,
 	UI_MAP_REDRAW,
+	UI_RANDOM,
 	LAST_SIGNAL
 };
 
@@ -28,6 +29,8 @@ struct GourmapUiPrivate
 	GtkWidget *map;
 	GtkWidget *addr_entry;
 	GtkWidget *treeview;
+	GtkWidget *rand_button;
+	GtkTreeStore *store;
 	WebKitWebView *web_view;
 	unsigned int zoom;
 	unsigned int radius;
@@ -147,6 +150,13 @@ activate_addr_entry_cb (GtkWidget *entry, gpointer data)
 }
 
 static void
+random_button_cb (GtkWidget *button, gpointer data)
+{
+	GourmapUi *ui = GOURMAP_UI (data);
+	g_signal_emit (G_OBJECT (ui), signals[UI_RANDOM], 0);
+}
+
+static void
 create_map_window (GourmapUi *ui)
 {
 	GourmapUiPrivate *priv;
@@ -154,8 +164,9 @@ create_map_window (GourmapUi *ui)
 	GtkWidget *vbox1, *vbox2;
 	GtkWidget *toolbar;
 	GtkWidget *addr_label;
-	GtkWidget *rand_button;
 	GtkToolItem *item;
+	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *column;
 
 	priv = GET_PRIVATE (ui);
 	hbox = gtk_hbox_new (FALSE, 0);
@@ -175,14 +186,24 @@ create_map_window (GourmapUi *ui)
 	vbox2 = gtk_vbox_new (FALSE, 0);
 
 	/* restaurant list */
-	/* TODO treeview list for restaurants */
-	priv->treeview = gtk_label_new ("Restaurnat List");
+	priv->store = gtk_tree_store_new (1, G_TYPE_STRING);
+	priv->treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL (priv->store));
+	renderer = gtk_cell_renderer_text_new ();
+	column = gtk_tree_view_column_new_with_attributes (_("Restaurant List"),
+							   renderer,
+							   "text", 0,
+							   NULL);
+	gtk_tree_view_append_column (GTK_TREE_VIEW (priv->treeview), column);
+
 	gtk_box_pack_start (GTK_BOX (vbox2), priv->treeview, TRUE, TRUE, 0);
 
 	/* random button */
-	rand_button = gtk_button_new_with_label (_("Random Choose!"));
-	/* TODO connect the clicked signal */
-	gtk_box_pack_start (GTK_BOX (vbox2), rand_button, FALSE, FALSE, 0);
+	priv->rand_button = gtk_button_new_with_label (_("Random Choose!"));
+	g_signal_connect (G_OBJECT (priv->rand_button),
+			  "clicked",
+			  G_CALLBACK (random_button_cb),
+			  (gpointer) ui);
+	gtk_box_pack_start (GTK_BOX (vbox2), priv->rand_button, FALSE, FALSE, 0);
 
 	gtk_box_pack_start (GTK_BOX (hbox), priv->map, TRUE, TRUE, 0);
 	gtk_box_pack_start (GTK_BOX (hbox), vbox2, FALSE, FALSE, 0);
@@ -269,6 +290,14 @@ gourmap_ui_class_init (GourmapUiClass *klass)
 			      G_TYPE_FROM_CLASS (klass),
 			      G_SIGNAL_RUN_LAST,
 			      G_STRUCT_OFFSET (GourmapUiClass, ui_map_redraw),
+			      NULL, NULL,
+			      g_cclosure_marshal_VOID__VOID,
+			      G_TYPE_NONE, 0, G_TYPE_NONE);
+	signals[UI_RANDOM] =
+		g_signal_new ("ui-random",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_LAST,
+			      G_STRUCT_OFFSET (GourmapUiClass, ui_random),
 			      NULL, NULL,
 			      g_cclosure_marshal_VOID__VOID,
 			      G_TYPE_NONE, 0, G_TYPE_NONE);

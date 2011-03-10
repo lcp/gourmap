@@ -27,6 +27,7 @@ typedef struct
 
 	void			(*ui_addr_updated) (GourmapUi *ui, const char *addr);
 	void			(*ui_map_redraw) (GourmapUi *ui);
+	void			(*ui_random) (GourmapUi *ui);
 } GourmapUiClass;
 
 GType		 gourmap_ui_get_type	(void);
