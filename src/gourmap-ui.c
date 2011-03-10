@@ -85,6 +85,7 @@ construct_poi_markers (GList *poi_list)
 						     rest->longitude,
 						     rest->address);
 		}
+		/* TODO Construct the list for priv->treeview */
 		list_i = list_i->next;
 	}
 
@@ -157,6 +158,23 @@ random_button_cb (GtkWidget *button, gpointer data)
 }
 
 static void
+tree_selection_changed_cb (GtkTreeSelection *selection,
+			   gpointer data)
+{
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+	char *name;
+
+	if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
+		gtk_tree_model_get (model, &iter, 0, &name, -1);
+		g_debug ("%s is selected", name);
+		/* TODO notify coord the change */
+
+		g_free (name);
+	}
+}
+
+static void
 create_map_window (GourmapUi *ui)
 {
 	GourmapUiPrivate *priv;
@@ -167,6 +185,7 @@ create_map_window (GourmapUi *ui)
 	GtkToolItem *item;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
+	GtkTreeSelection *select;
 
 	priv = GET_PRIVATE (ui);
 	hbox = gtk_hbox_new (FALSE, 0);
@@ -193,6 +212,11 @@ create_map_window (GourmapUi *ui)
 							   renderer,
 							   "text", 0,
 							   NULL);
+	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->treeview));
+	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
+	g_signal_connect (G_OBJECT (select), "changed",
+			  G_CALLBACK (tree_selection_changed_cb),
+			  NULL);
 	gtk_tree_view_append_column (GTK_TREE_VIEW (priv->treeview), column);
 
 	gtk_box_pack_start (GTK_BOX (vbox2), priv->treeview, TRUE, TRUE, 0);
