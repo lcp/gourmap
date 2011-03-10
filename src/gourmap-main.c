@@ -1,13 +1,17 @@
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 
-#include "gourmap-ui.h"
+#include "gourmap-coord.h"
 
 int
 main (int argc, char **argv)
 {
-	GourmapUi *ui;
+	GourmapCoord *coord;
 
 #ifdef ENABLE_NLS
 	bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
@@ -17,9 +21,11 @@ main (int argc, char **argv)
 
 	gtk_init (&argc, &argv);
 
-	ui = gourmap_ui_new ();
+	coord = gourmap_coord_new ();
 
 	gtk_main ();
+
+	g_object_unref (coord);
 
 	return 0;
 }
