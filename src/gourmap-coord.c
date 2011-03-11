@@ -89,6 +89,7 @@ _got_gmap_geocode (RestProxyCall *call,
 						       priv->radius);
 	}
 
+	gourmap_ui_update_list (priv->ui, priv->poi_list);
 	gourmap_ui_update_map (priv->ui, lat, lng, priv->poi_list);
 
 	priv->current_lat = lat;
@@ -179,6 +180,7 @@ gourmap_coord_init (GourmapCoord *coord)
 					       priv->current_lat,
 					       priv->current_lng,
 					       priv->radius);
+	gourmap_ui_update_list (priv->ui, priv->poi_list);
 	gourmap_coord_map_redraw_cb (priv->ui, coord);
 }
 
