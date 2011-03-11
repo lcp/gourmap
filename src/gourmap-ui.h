@@ -34,6 +34,7 @@ typedef struct
 GType		 gourmap_ui_get_type	(void);
 GourmapUi	*gourmap_ui_new		(void);
 
+void		 gourmap_ui_show_up	(GourmapUi	*ui);
 void		 gourmap_ui_set_zoom	(GourmapUi	*ui,
 					 unsigned int	 zoom);
 void		 gourmap_ui_set_radius	(GourmapUi	*ui,

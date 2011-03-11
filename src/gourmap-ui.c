@@ -50,6 +50,15 @@ G_DEFINE_TYPE (GourmapUi, gourmap_ui, G_TYPE_OBJECT)
                         GOURMAP_TYPE_UI, GourmapUiPrivate))
 
 void
+gourmap_ui_show_up (GourmapUi *ui)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+
+	gtk_widget_grab_focus (priv->addr_entry);
+	gtk_widget_show_all (priv->main_window);
+}
+
+void
 gourmap_ui_set_zoom (GourmapUi    *ui,
 		     unsigned int  zoom)
 {
@@ -360,9 +369,6 @@ gourmap_ui_init (GourmapUi *ui)
 	priv->radius = 850;
 
 	create_map_window (ui);
-
-	gtk_widget_grab_focus (priv->addr_entry);
-	gtk_widget_show_all (priv->main_window);
 }
 
 static void
