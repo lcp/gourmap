@@ -40,6 +40,8 @@ main (int argc, char **argv)
 		poi_db_filename = PACKAGE_DATA_DIR"/gourmap/poi.db";
 	gourmap_coord_import_poi_db (coord, poi_db_filename);
 
+	gourmap_coord_startup (coord);
+
 	gtk_main ();
 
 	g_object_unref (coord);
