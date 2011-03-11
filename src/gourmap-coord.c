@@ -168,6 +168,11 @@ gourmap_coord_rest_selected_cb (GourmapUi *ui,
 
 	g_debug ("name = %s, lat = %.6f, lng = %.6f, address = %s",
 		 rest->name, rest->latitude, rest->longitude, rest->address);
+
+	priv->map_lat = rest->latitude;
+	priv->map_lng = rest->longitude;
+
+	gourmap_coord_map_redraw_cb (priv->ui, coord);
 }
 
 static void
