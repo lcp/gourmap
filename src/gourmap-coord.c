@@ -18,6 +18,8 @@ struct GourmapCoordPrivate
 	char *db_file;
 	double current_lat;
 	double current_lng;
+	double map_lat;
+	double map_lng;
 	unsigned int zoom;
 	unsigned int radius;
 	GList *poi_list;
@@ -90,7 +92,10 @@ _got_gmap_geocode (RestProxyCall *call,
 	}
 
 	gourmap_ui_update_list (priv->ui, priv->poi_list);
-	gourmap_ui_update_map (priv->ui, lat, lng, priv->poi_list);
+	gourmap_ui_update_map (priv->ui,
+			       lat, lng,
+			       lat, lng,
+			       priv->poi_list);
 
 	priv->current_lat = lat;
 	priv->current_lng = lng;
@@ -127,6 +132,8 @@ gourmap_coord_map_redraw_cb (GourmapUi    *ui,
 	gourmap_ui_update_map (priv->ui,
 			       priv->current_lat,
 			       priv->current_lng,
+			       priv->map_lat,
+			       priv->map_lng,
 			       priv->poi_list);
 }
 
@@ -173,6 +180,8 @@ gourmap_coord_init (GourmapCoord *coord)
 	/* Default location: Taipei 101 building */
 	priv->current_lat = 25.033867;
 	priv->current_lng = 121.564126;
+	priv->map_lat = 25.033867;
+	priv->map_lng = 121.564126;
 	priv->zoom = 16;
 	priv->radius = 850;
 

@@ -109,8 +109,10 @@ construct_poi_markers (GList *poi_list)
 
 void
 gourmap_ui_update_map (GourmapUi    *ui,
-		       const double  latitude,
-		       const double  longitude,
+		       const double  my_lat,
+		       const double  my_lng,
+		       const double  center_lat,
+		       const double  center_lng,
 		       GList        *poi_list)
 {
 	GourmapUiPrivate *priv = GET_PRIVATE (ui);
@@ -121,8 +123,10 @@ gourmap_ui_update_map (GourmapUi    *ui,
 	}
 
 	map_html = g_strdup_printf (google_map_template,
-				    latitude,      /* Map Center latitude  */
-				    longitude,     /* Map Center longitude */
+				    my_lat,        /* My latitude  */
+				    my_lng,        /* My longitude */
+				    center_lat,    /* Map Center latitude  */
+				    center_lng,    /* Map Center longitude */
 				    priv->zoom,    /* Zoom Level */
 				    priv->radius,  /* Circle Radius */
                                     poi_markers);

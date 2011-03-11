@@ -2,8 +2,10 @@
 #define __GOOGLE_MAP_TEMPLATE_H__
 
 /* Parameters:
-   (double) latitude,
-   (double) longitude,
+   (double) my_latitude,
+   (double) my_longitude,
+   (double) map_latitude,
+   (double) map_longitude,
    (unsigned int) map_zoom_level,
    (unsigned int) circle_radius,
    (char *) gmap_restaurant_markers
@@ -18,11 +20,12 @@ const char *google_map_template =
 "<script type=\"text/javascript\">"
 "var map;"
 "var circle;"
+"var myLatlng = new google.maps.LatLng(%.6f, %.6f);" /*my_latitude, my_longitude*/
+"var mapCenter = new google.maps.LatLng(%.6f, %.6f);" /*map_latitude, map_ongitude*/
 "function initialize() {"
-"	var myLatlng = new google.maps.LatLng(%.6f, %.6f);" /*Latitude, Longitude*/
 "	var myOptions = {"
 "		zoom: %u," /* Zoom level */
-"		center: myLatlng,"
+"		center: mapCenter,"
 "		mapTypeControl: false,"
 "		mapTypeId: google.maps.MapTypeId.ROADMAP,"
 "		streetViewControl: false,"

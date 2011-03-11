@@ -39,8 +39,10 @@ void		 gourmap_ui_set_zoom	(GourmapUi	*ui,
 void		 gourmap_ui_set_radius	(GourmapUi	*ui,
 					 unsigned int	 radius);
 void		 gourmap_ui_update_map	(GourmapUi	*ui,
-					 const double	 latitude,
-					 const double	 longitude,
+					 const double	 my_lat,
+					 const double	 my_lng,
+					 const double	 center_lat,
+					 const double	 center_lng,
 					 GList		*poi_list);
 void		 gourmap_ui_update_list (GourmapUi	*ui,
 					 GList		*poi_list);
