@@ -18,6 +18,7 @@ enum {
 	UI_ADDR_UPDATED,
 	UI_MAP_REDRAW,
 	UI_RANDOM,
+	UI_REST_SELECTED,
 	LAST_SIGNAL
 };
 
@@ -189,6 +190,7 @@ static void
 tree_selection_changed_cb (GtkTreeSelection *selection,
 			   gpointer data)
 {
+	GourmapUi *ui = GOURMAP_UI (data);
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 	char *name;
@@ -200,7 +202,8 @@ tree_selection_changed_cb (GtkTreeSelection *selection,
 				   INDEX_COLUMN, &index,
 				   -1);
 		g_debug ("%s : %u is selected", name, index);
-		/* TODO notify coord the change */
+
+		g_signal_emit (G_OBJECT (ui), signals[UI_REST_SELECTED], 0, index);
 
 		g_free (name);
 	}
@@ -248,7 +251,7 @@ create_map_window (GourmapUi *ui)
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
 	g_signal_connect (G_OBJECT (select), "changed",
 			  G_CALLBACK (tree_selection_changed_cb),
-			  NULL);
+			  (gpointer) ui);
 	gtk_tree_view_append_column (GTK_TREE_VIEW (priv->treeview), column);
 
 	gtk_box_pack_start (GTK_BOX (vbox2), priv->treeview, TRUE, TRUE, 0);
@@ -357,6 +360,14 @@ gourmap_ui_class_init (GourmapUiClass *klass)
 			      NULL, NULL,
 			      g_cclosure_marshal_VOID__VOID,
 			      G_TYPE_NONE, 0, G_TYPE_NONE);
+	signals[UI_REST_SELECTED] =
+		g_signal_new ("ui-rest-selected",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_LAST,
+			      G_STRUCT_OFFSET (GourmapUiClass, ui_rest_selected),
+			      NULL, NULL,
+			      g_cclosure_marshal_VOID__UINT,
+			      G_TYPE_NONE, 1, G_TYPE_UINT);
 }
 
 GourmapUi *
