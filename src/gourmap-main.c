@@ -16,7 +16,7 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	const GOptionEntry options[] = {
 		{ "import", 'i', 0, G_OPTION_ARG_STRING, &poi_db_filename,
-		  /* TRANSLATORS: use another config file instead of the default one */
+		  /* TRANSLATORS: import another POI database instead of the default one */
 		  _("Import a POI database"), NULL },
 		{ NULL }
 	};
