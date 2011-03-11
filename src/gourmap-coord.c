@@ -204,10 +204,10 @@ gourmap_coord_init (GourmapCoord *coord)
 
 	priv->proxy = rest_proxy_new ("http://maps.google.com/maps/api/", FALSE);
 	/* Default location: Taipei 101 building */
-	priv->current_lat = 25.033867;
-	priv->current_lng = 121.564126;
-	priv->map_lat = 25.033867;
-	priv->map_lng = 121.564126;
+	priv->current_lat = 25.033194;
+	priv->current_lng = 121.564837;
+	priv->map_lat = priv->current_lat;
+	priv->map_lng = priv->current_lng;
 	priv->zoom = 16;
 	priv->radius = 850;
 
@@ -218,6 +218,8 @@ gourmap_coord_init (GourmapCoord *coord)
 	priv->ui = gourmap_ui_new ();
 	gourmap_ui_set_zoom (priv->ui, priv->zoom);
 	gourmap_ui_set_radius (priv->ui, priv->radius);
+	gourmap_ui_set_addr (priv->ui,
+			     "台北市信義區信義路五段7號");
 	g_signal_connect (G_OBJECT (priv->ui),
 			  "ui-addr-updated",
 			  G_CALLBACK (gourmap_coord_addr_updated_cb),
