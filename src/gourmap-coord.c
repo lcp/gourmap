@@ -2,6 +2,8 @@
 #  include "config.h"
 #endif
 
+#include <stdlib.h>
+#include <time.h>
 #include <rest/rest-proxy.h>
 #include <json-glib/json-glib.h>
 
@@ -142,13 +144,16 @@ gourmap_coord_random_button_cb (GourmapUi    *ui,
 				GourmapCoord *coord)
 {
 	GourmapCoordPrivate *priv = GET_PRIVATE (coord);
+	guint index;
 
 	g_debug ("random button clicked");
 
 	if (priv->poi_list == NULL)
 		return;
 
-	/* TODO select a restaurant randomly */
+	srandom (time (NULL));
+	index = random () % g_list_length (priv->poi_list);
+	gourmap_ui_select (ui, index);
 }
 
 static void
