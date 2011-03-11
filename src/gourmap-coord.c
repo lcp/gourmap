@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <glib/gi18n.h>
 #include <rest/rest-proxy.h>
 #include <json-glib/json-glib.h>
 
@@ -56,8 +57,8 @@ _got_gmap_geocode (RestProxyCall *call,
 
 	root = json_node_from_call (call);
 	if (!root) {
-		g_message ("Not a vaild json");
-		/* TODO notification for user */
+		gourmap_ui_warning (priv->ui,
+				    _("Failed to get the geocode from Google geocoder"));
 		return;
 	}
 
@@ -65,8 +66,8 @@ _got_gmap_geocode (RestProxyCall *call,
 	/* http://code.google.com/intl/zh-TW/apis/maps/documentation/geocoding/index.html#JSON */
 	obj = json_node_get_object (root);
 	if (!json_object_has_member (obj, "results")) {
-		g_message ("No results");
-		/* TODO notification for user */
+		gourmap_ui_warning (priv->ui,
+				    _("Nothing returned from Google geocoder"));
 		return;
 	}
 	node = json_object_get_member (obj, "results");
