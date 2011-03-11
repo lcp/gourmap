@@ -74,6 +74,14 @@ gourmap_ui_set_radius (GourmapUi    *ui,
 	priv->radius = radius;
 }
 
+void
+gourmap_ui_set_addr (GourmapUi  *ui,
+		     const char *addr)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+	gtk_entry_set_text (GTK_ENTRY (priv->addr_entry), addr);
+}
+
 char *
 construct_poi_markers (GList *poi_list)
 {
