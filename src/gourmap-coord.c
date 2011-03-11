@@ -145,6 +145,25 @@ gourmap_coord_random_button_cb (GourmapUi    *ui,
 }
 
 static void
+gourmap_coord_rest_selected_cb (GourmapUi *ui,
+				const guint index,
+				GourmapCoord *coord)
+{
+	GourmapCoordPrivate *priv = GET_PRIVATE (coord);
+	Restaurant *rest;
+
+	if (priv->poi_list == NULL) {
+		g_message ("Empty POI list");
+		return;
+	}
+
+	rest = (Restaurant *)g_list_nth_data (priv->poi_list, index);
+
+	g_debug ("name = %s, lat = %.6f, lng = %.6f, address = %s",
+		 rest->name, rest->latitude, rest->longitude, rest->address);
+}
+
+static void
 gourmap_coord_init (GourmapCoord *coord)
 {
 	GourmapCoordPrivate *priv;
@@ -175,6 +194,10 @@ gourmap_coord_init (GourmapCoord *coord)
 	g_signal_connect (G_OBJECT (priv->ui),
 			  "ui-random",
 			  G_CALLBACK (gourmap_coord_random_button_cb),
+			  (gpointer) coord);
+	g_signal_connect (G_OBJECT (priv->ui),
+			  "ui-rest-selected",
+			  G_CALLBACK (gourmap_coord_rest_selected_cb),
 			  (gpointer) coord);
 	priv->poi_list = gourmap_poi_find_poi (priv->poi,
 					       priv->current_lat,
