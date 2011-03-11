@@ -146,6 +146,11 @@ gourmap_ui_update_list (GourmapUi *ui,
 
 	gtk_tree_store_clear (priv->store);
 
+	if (poi_list == NULL) {
+		gtk_widget_set_sensitive (priv->rand_button, FALSE);
+		return;
+	}
+
 	for (list_i = poi_list; list_i; list_i = list_i->next) {
 		Restaurant *rest = (Restaurant *)list_i->data;
 		GtkTreeIter iter;
@@ -155,6 +160,8 @@ gourmap_ui_update_list (GourmapUi *ui,
 				    INDEX_COLUMN, index++,
 				    -1);
 	}
+
+	gtk_widget_set_sensitive (priv->rand_button, TRUE);
 }
 
 static void
