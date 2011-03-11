@@ -18,6 +18,11 @@
  *
  */
 
+/*
+ * Special Thanks to google-maps-icons project which provides a free high
+ * quality restaurant icon.
+ */
+
 #ifndef __GOOGLE_MAP_TEMPLATE_H__
 #define __GOOGLE_MAP_TEMPLATE_H__
 
