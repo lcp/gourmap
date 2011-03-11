@@ -185,6 +185,22 @@ gourmap_ui_select (GourmapUi  *ui,
 	gtk_tree_selection_select_iter (select, &iter);
 }
 
+void
+gourmap_ui_warning (GourmapUi  *ui,
+		    const char *str)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+	GtkWidget *dialog;
+
+	dialog = gtk_message_dialog_new (GTK_WINDOW (priv->main_window),
+					 GTK_DIALOG_MODAL,
+					 GTK_MESSAGE_WARNING,
+					 GTK_BUTTONS_OK,
+					 "%s", str);
+	gtk_dialog_run (GTK_DIALOG (dialog));
+	gtk_widget_destroy (dialog);
+}
+
 static void
 destroy_cb (GtkWidget *widget, gpointer data)
 {
