@@ -168,6 +168,23 @@ gourmap_ui_update_list (GourmapUi *ui,
 	gtk_widget_set_sensitive (priv->rand_button, TRUE);
 }
 
+
+void
+gourmap_ui_select (GourmapUi  *ui,
+		   const guint index)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+	GtkTreeModel *model = GTK_TREE_MODEL (priv->store);
+	GtkTreeIter iter;
+	GtkTreeSelection *select;
+
+	g_debug ("random selection: %u", index);
+
+	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->treeview));
+	gtk_tree_model_iter_nth_child (model, &iter, NULL, index);
+	gtk_tree_selection_select_iter (select, &iter);
+}
+
 static void
 destroy_cb (GtkWidget *widget, gpointer data)
 {

@@ -46,6 +46,8 @@ void		 gourmap_ui_update_map	(GourmapUi	*ui,
 					 GList		*poi_list);
 void		 gourmap_ui_update_list (GourmapUi	*ui,
 					 GList		*poi_list);
+void		 gourmap_ui_select	(GourmapUi	*ui,
+					 const guint	 index);
 G_END_DECLS
 
 #endif /* __GOURMAP_UI_H__ */
