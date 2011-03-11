@@ -23,6 +23,13 @@ enum {
 
 static int signals[LAST_SIGNAL] = { 0 };
 
+enum
+{
+	NAME_COLUMN,
+	INDEX_COLUMN,
+	N_COLUMNS
+};
+
 struct GourmapUiPrivate
 {
 	GtkWidget *main_window;
@@ -85,7 +92,6 @@ construct_poi_markers (GList *poi_list)
 						     rest->longitude,
 						     rest->address);
 		}
-		/* TODO Construct the list for priv->treeview */
 		list_i = list_i->next;
 	}
 
@@ -128,6 +134,28 @@ gourmap_ui_update_map (GourmapUi    *ui,
 	g_free (poi_markers);
 }
 
+
+void
+gourmap_ui_update_list (GourmapUi *ui,
+		        GList     *poi_list)
+{
+	GourmapUiPrivate *priv = GET_PRIVATE (ui);
+	GList *list_i;
+	guint index = 0;
+
+	gtk_tree_store_clear (priv->store);
+
+	for (list_i = poi_list; list_i; list_i = list_i->next) {
+		Restaurant *rest = (Restaurant *)list_i->data;
+		GtkTreeIter iter;
+		gtk_tree_store_append (priv->store, &iter, NULL);
+		gtk_tree_store_set (priv->store, &iter,
+				    NAME_COLUMN, rest->name,
+				    INDEX_COLUMN, index++,
+				    -1);
+	}
+}
+
 static void
 destroy_cb (GtkWidget *widget, gpointer data)
 {
@@ -164,10 +192,14 @@ tree_selection_changed_cb (GtkTreeSelection *selection,
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 	char *name;
+	guint index;
 
 	if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
-		gtk_tree_model_get (model, &iter, 0, &name, -1);
-		g_debug ("%s is selected", name);
+		gtk_tree_model_get (model, &iter,
+				   NAME_COLUMN, &name,
+				   INDEX_COLUMN, &index,
+				   -1);
+		g_debug ("%s : %u is selected", name, index);
 		/* TODO notify coord the change */
 
 		g_free (name);
@@ -205,12 +237,12 @@ create_map_window (GourmapUi *ui)
 	vbox2 = gtk_vbox_new (FALSE, 0);
 
 	/* restaurant list */
-	priv->store = gtk_tree_store_new (1, G_TYPE_STRING);
+	priv->store = gtk_tree_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_UINT);
 	priv->treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL (priv->store));
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes (_("Restaurant List"),
 							   renderer,
-							   "text", 0,
+							   "text", NAME_COLUMN,
 							   NULL);
 	select = gtk_tree_view_get_selection (GTK_TREE_VIEW (priv->treeview));
 	gtk_tree_selection_set_mode (select, GTK_SELECTION_SINGLE);
