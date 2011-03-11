@@ -147,8 +147,6 @@ gourmap_coord_random_button_cb (GourmapUi    *ui,
 	GourmapCoordPrivate *priv = GET_PRIVATE (coord);
 	guint index;
 
-	g_debug ("random button clicked");
-
 	if (priv->poi_list == NULL)
 		return;
 

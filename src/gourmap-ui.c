@@ -245,7 +245,6 @@ tree_selection_changed_cb (GtkTreeSelection *selection,
 				   NAME_COLUMN, &name,
 				   INDEX_COLUMN, &index,
 				   -1);
-		g_debug ("%s : %u is selected", name, index);
 
 		g_signal_emit (G_OBJECT (ui), signals[UI_REST_SELECTED], 0, index);
 
