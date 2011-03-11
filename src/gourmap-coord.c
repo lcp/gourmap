@@ -33,6 +33,8 @@ G_DEFINE_TYPE (GourmapCoord, gourmap_coord, G_TYPE_OBJECT)
 #define GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
                         GOURMAP_TYPE_COORD, GourmapCoordPrivate))
 
+static void gourmap_coord_map_redraw_cb (GourmapUi *ui, GourmapCoord *coord);
+
 gboolean
 gourmap_coord_import_poi_db (GourmapCoord *coord,
 			     const char   *db_filename)
@@ -40,6 +42,21 @@ gourmap_coord_import_poi_db (GourmapCoord *coord,
 	GourmapCoordPrivate *priv = GET_PRIVATE (coord);
 
 	return gourmap_poi_import_db (priv->poi, db_filename);
+}
+
+gboolean
+gourmap_coord_startup (GourmapCoord *coord)
+{
+	GourmapCoordPrivate *priv = GET_PRIVATE (coord);
+
+	priv->poi_list = gourmap_poi_find_poi (priv->poi,
+					       priv->current_lat,
+					       priv->current_lng,
+					       priv->radius);
+	gourmap_ui_update_list (priv->ui, priv->poi_list);
+	gourmap_coord_map_redraw_cb (priv->ui, coord);
+
+	gourmap_ui_show_up (priv->ui);
 }
 
 static void
@@ -217,12 +234,6 @@ gourmap_coord_init (GourmapCoord *coord)
 			  "ui-rest-selected",
 			  G_CALLBACK (gourmap_coord_rest_selected_cb),
 			  (gpointer) coord);
-	priv->poi_list = gourmap_poi_find_poi (priv->poi,
-					       priv->current_lat,
-					       priv->current_lng,
-					       priv->radius);
-	gourmap_ui_update_list (priv->ui, priv->poi_list);
-	gourmap_coord_map_redraw_cb (priv->ui, coord);
 }
 
 static void

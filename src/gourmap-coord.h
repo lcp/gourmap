@@ -29,6 +29,7 @@ GType		 gourmap_coord_get_type		(void);
 GourmapCoord	*gourmap_coord_new		(void);
 gboolean	 gourmap_coord_import_poi_db	(GourmapCoord	*coord,
 						 const char	*db_filename);
+gboolean	 gourmap_coord_startup		(GourmapCoord	*coord);
 
 G_END_DECLS
 
