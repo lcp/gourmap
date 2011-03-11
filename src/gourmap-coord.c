@@ -123,13 +123,6 @@ gourmap_coord_map_redraw_cb (GourmapUi    *ui,
 {
 	GourmapCoordPrivate *priv = GET_PRIVATE (coord);
 
-	if (priv->poi_list == NULL) {
-		priv->poi_list = gourmap_poi_find_poi (priv->poi,
-						       priv->current_lat,
-						       priv->current_lng,
-						       priv->radius);
-	}
-
 	gourmap_ui_update_map (priv->ui,
 			       priv->current_lat,
 			       priv->current_lng,
@@ -182,7 +175,10 @@ gourmap_coord_init (GourmapCoord *coord)
 			  "ui-random",
 			  G_CALLBACK (gourmap_coord_random_button_cb),
 			  (gpointer) coord);
-
+	priv->poi_list = gourmap_poi_find_poi (priv->poi,
+					       priv->current_lat,
+					       priv->current_lng,
+					       priv->radius);
 	gourmap_coord_map_redraw_cb (priv->ui, coord);
 }
 
