@@ -131,14 +131,13 @@ _got_gmap_geocode (RestProxyCall *call,
 						       priv->radius);
 	}
 
-	gourmap_ui_update_list (priv->ui, priv->poi_list);
-	gourmap_ui_update_map (priv->ui,
-			       lat, lng,
-			       lat, lng,
-			       priv->poi_list);
-
 	priv->current_lat = lat;
 	priv->current_lng = lng;
+	priv->map_lat = lat;
+	priv->map_lng = lng;
+
+	gourmap_ui_update_list (priv->ui, priv->poi_list);
+	gourmap_coord_map_redraw_cb (priv->ui, coord);
 }
 
 static void
