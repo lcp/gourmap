@@ -77,6 +77,8 @@ gourmap_coord_startup (GourmapCoord *coord)
 	gourmap_coord_map_redraw_cb (priv->ui, coord);
 
 	gourmap_ui_show_up (priv->ui);
+
+	return TRUE;
 }
 
 static void
