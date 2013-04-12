@@ -13,9 +13,10 @@ INCLUDES = \
 	-I$(top_srcdir)						\
 	$(REST_CFLAGS)						\
 	$(JSON_GLIB_CFLAGS)					\
-	$(GTK2_CFLAGS)						\
+	$(GTK3_CFLAGS)						\
 	$(GOBJECT_CFLAGS)					\
-	$(WEBKIT_CFLAGS)					\
+	$(CLUTTER_GTK_CFLAGS)					\
+	$(CHAMPLAIN_CFLAGS)					\
 	$(GLIB_CFLAGS)
 
 libexec_PROGRAMS = gourmap
@@ -34,9 +35,10 @@ gourmap_SOURCES =						\
 gourmap_LDADD =							\
 	$(REST_LIBS)						\
 	$(JSON_GLIB_LIBS)					\
-	$(GTK2_LIBS)						\
+	$(GTK3_LIBS)						\
 	$(GOBJECT_LIBS)						\
-	$(WEBKIT_LIBS)						\
+	$(CLUTTER_GTK_LIBS)					\
+	$(CHAMPLAIN_LIBS)					\
 	$(GLIB_LIBS)						\
 	-lm
 

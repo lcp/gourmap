@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2011 Gary Ching-Pang Lin <glin@novell.com>
+ * Copyright (C) 2013 Gary Ching-Pang Lin <glin@suse.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
-#include <webkit/webkit.h>
+
+#include <champlain-gtk/champlain-gtk.h>
 
 #include <rest/rest-proxy.h>
 #include <json-glib/json-glib.h>
@@ -59,9 +60,11 @@ struct GourmapUiPrivate
 	GtkWidget *treeview;
 	GtkWidget *rand_button;
 	GtkTreeStore *store;
-	WebKitWebView *web_view;
 	unsigned int zoom;
 	unsigned int radius;
+
+	ChamplainView *champ_view;
+	ChamplainMarkerLayer *marker_layer;
 };
 
 G_DEFINE_TYPE (GourmapUi, gourmap_ui, G_TYPE_OBJECT)
@@ -102,48 +105,6 @@ gourmap_ui_set_addr (GourmapUi  *ui,
 	gtk_entry_set_text (GTK_ENTRY (priv->addr_entry), addr);
 }
 
-char *
-construct_poi_markers (GList *poi_list)
-{
-	char *poi_array = NULL;
-	char *poi_markers = NULL;
-	GList *list_i;
-	Restaurant *rest;
-
-	list_i = poi_list;
-	while (list_i) {
-		char *prev;
-		rest = (Restaurant *)list_i->data;
-		if (poi_array != NULL) {
-			prev = poi_array;
-			poi_array = g_strdup_printf ("%s [\'%s\', %.6f, %.6f, \'%s\'],",
-						     prev,
-						     rest->name,
-						     rest->latitude,
-						     rest->longitude,
-						     rest->address);
-			g_free (prev);
-		} else {
-			poi_array = g_strdup_printf ("[\'%s\', %.6f, %.6f, \'%s\'],",
-						     rest->name,
-						     rest->latitude,
-						     rest->longitude,
-						     rest->address);
-		}
-		list_i = list_i->next;
-	}
-
-	if (poi_array == NULL)
-		return NULL;
-
-	poi_markers = g_strdup_printf (gmap_restaurant_markers,
-				       poi_array);
-
-	g_free (poi_array);
-
-	return poi_markers;
-}
-
 void
 gourmap_ui_update_map (GourmapUi    *ui,
 		       const double  my_lat,
@@ -153,29 +114,46 @@ gourmap_ui_update_map (GourmapUi    *ui,
 		       GList        *poi_list)
 {
 	GourmapUiPrivate *priv = GET_PRIVATE (ui);
-	char *map_html, *poi_markers = NULL;
+	ClutterActor *marker;
+	ClutterColor *color;
+	Restaurant *rest;
+	GList *list_i;
 
-	if (poi_list != NULL) {
-		poi_markers = construct_poi_markers (poi_list);
+	/* remove previous markers */
+	champlain_marker_layer_remove_all (priv->marker_layer);
+
+	champlain_view_set_zoom_level (priv->champ_view, priv->zoom);
+
+	champlain_view_go_to (priv->champ_view, my_lat, my_lng);
+
+	color = clutter_color_new (0xff, 0x20, 0x15, 0xbb);
+	marker = champlain_label_new_with_text (_("I'm here"),
+						"Serif 14", NULL, color);
+	clutter_color_free (color);
+	champlain_location_set_location (CHAMPLAIN_LOCATION (marker),
+					 my_lat, my_lng);
+	champlain_marker_layer_add_marker (priv->marker_layer,
+					   CHAMPLAIN_MARKER (marker));
+
+	/* Put restaurant markers */
+	list_i = poi_list;
+	color = clutter_color_new (0xff, 0x20, 0xff, 0xbb);
+	while (list_i != NULL) {
+		rest = (Restaurant *)list_i->data;
+		marker = champlain_label_new_with_text (rest->name,
+							"Serif 10",
+							NULL, color);
+		champlain_location_set_location (CHAMPLAIN_LOCATION (marker),
+						 rest->latitude,
+						 rest->longitude);
+		champlain_marker_layer_add_marker (priv->marker_layer,
+						   CHAMPLAIN_MARKER (marker));
+		list_i = g_list_next (list_i);
 	}
+	clutter_color_free (color);
 
-	map_html = g_strdup_printf (google_map_template,
-				    my_lat,        /* My latitude  */
-				    my_lng,        /* My longitude */
-				    center_lat,    /* Map Center latitude  */
-				    center_lng,    /* Map Center longitude */
-				    priv->zoom,    /* Zoom Level */
-				    priv->radius,  /* Circle Radius */
-                                    poi_markers);
-	webkit_web_view_load_string (WEBKIT_WEB_VIEW (priv->web_view),
-				     map_html,
-				     "text/html",
-				     "UTF-8",
-				     "");
-	g_free (map_html);
-	g_free (poi_markers);
+	champlain_marker_layer_show_all_markers (priv->marker_layer);
 }
-
 
 void
 gourmap_ui_update_list (GourmapUi *ui,
@@ -303,21 +281,22 @@ create_map_window (GourmapUi *ui)
 	GtkTreeSelection *select;
 
 	priv = GET_PRIVATE (ui);
-	hbox = gtk_hbox_new (FALSE, 0);
-	vbox1 = gtk_vbox_new (FALSE, 0);
-	vbox2 = gtk_vbox_new (FALSE, 0);
+	hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+	vbox1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+	vbox2 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
 	/* map */
-	priv->map = gtk_scrolled_window_new (NULL, NULL);
-	priv->web_view = WEBKIT_WEB_VIEW (webkit_web_view_new ());
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (priv->map),
-					GTK_POLICY_AUTOMATIC,
-					GTK_POLICY_AUTOMATIC);
-	gtk_container_add (GTK_CONTAINER (priv->map), GTK_WIDGET (priv->web_view));
-
+	priv->map = gtk_champlain_embed_new ();
+	priv->champ_view = gtk_champlain_embed_get_view (GTK_CHAMPLAIN_EMBED (priv->map));
+	clutter_actor_set_reactive (CLUTTER_ACTOR (priv->champ_view), TRUE);
+	g_object_set (G_OBJECT (priv->champ_view),
+		      "kinetic-mode", TRUE,
+		      NULL);
+	priv->marker_layer = champlain_marker_layer_new_full (CHAMPLAIN_SELECTION_SINGLE);
+	champlain_view_add_layer (priv->champ_view, CHAMPLAIN_LAYER (priv->marker_layer));
 
 	/* sidebar */
-	vbox2 = gtk_vbox_new (FALSE, 0);
+	vbox2 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
 	/* restaurant list */
 	priv->store = gtk_tree_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_UINT);

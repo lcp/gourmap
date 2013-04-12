@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2011 Gary Ching-Pang Lin <glin@novell.com>
+ * Copyright (C) 2013 Gary Ching-Pang Lin <glin@suse.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ gourmap_coord_startup (GourmapCoord *coord)
 
 static void
 _got_gmap_geocode (RestProxyCall *call,
-		   GError        *error,
+		   const GError  *error,
 		   GObject       *weak_object,
 		   gpointer       userdata)
 {
@@ -225,8 +225,8 @@ gourmap_coord_init (GourmapCoord *coord)
 
 	priv->proxy = rest_proxy_new ("http://maps.google.com/maps/api/", FALSE);
 	/* Default location: Taipei 101 building */
-	priv->current_lat = 25.033194;
-	priv->current_lng = 121.564837;
+	priv->current_lat = 25.033718;
+	priv->current_lng = 121.564810;
 	priv->map_lat = priv->current_lat;
 	priv->map_lng = priv->current_lng;
 	priv->zoom = 16;

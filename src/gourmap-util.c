@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2011 Gary Ching-Pang Lin <glin@novell.com>
+ * Copyright (C) 2013 Gary Ching-Pang Lin <glin@suse.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ json_node_from_call (RestProxyCall *call)
 					  rest_proxy_call_get_payload (call),
 					  rest_proxy_call_get_payload_length (call),
 					  &error);
+	if (!ret)
+		goto out;
 	root = json_parser_get_root (parser);
 
 	if (root == NULL) {

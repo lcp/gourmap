@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2011 Gary Ching-Pang Lin <glin@novell.com>
+ * Copyright (C) 2011 Gary Ching-Pang Lin <glin@suse.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include <clutter-gtk/clutter-gtk.h>
 
 #include "gourmap-coord.h"
 
@@ -47,7 +48,8 @@ main (int argc, char **argv)
 	textdomain (GETTEXT_PACKAGE);
 #endif
 
-	gtk_init (&argc, &argv);
+	if (gtk_clutter_init (&argc, &argv) != CLUTTER_INIT_SUCCESS)
+		return -1;
 
 	context = g_option_context_new ("Gourmap");
 	g_option_context_add_main_entries (context, options, NULL);
